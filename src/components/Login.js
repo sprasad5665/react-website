@@ -1,41 +1,63 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import "./Login.css";
 import '../App.css';
 import AuthService from "../services/auth.service";
 import CheckButton from "react-validation/build/button";
+import {Link,NavLink,Redirect,useHistory } from 'react-router-dom';
+import Signup from './Signup'
 
 
 function Login() {
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
 
   const [values, setValues] = useState({
-    email: "",
+    username: "",
     password: "",
     loading: false,
     message: ""
     } );
 
+    const history = useHistory();
+
+  //   useEffect(() => {
+  //     return history.listen((location) => { 
+  //        console.log(`You changed the page to: ${location.pathname}`) 
+  //     }) 
+  //  },[history]) 
+
   function validateForm() {
-    return email.length > 0 && password.length > 0;
+    return values.username.length > 0 && values.password.length > 0;
+  };
+
+  const updateField = e => {
+    setValues({
+      ...values,
+      [e.target.name]: e.target.value
+    });
   };
 
   function handleLogin(e) {
     e.preventDefault();
+    e.target.reset();
 
     setValues({
       message: "",
       loading: true
     });
 
+    
+
     if (true) { //this.checkBtn.context._errors.length === 0
-      AuthService.login(values.email, values.password).then(
+      AuthService.login(values.username, values.password).then(
         () => {
-          // this.props.history.push("/profile");
-          // window.location.reload();
+         history.push({
+            pathname: '/profile',
+            state: {
+              response: "messageFromServer"
+            }
+        });
           console.log("success");
         },
         error => {
@@ -80,9 +102,11 @@ function Login() {
                   </div>
                   <Form.Control
                     autoFocus
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    type="text"
+                    name="username"
+                    placeholder="username"
+                    value={values.username}
+                    onChange={updateField}
                   />
                 </div>
                 <div class="input-group form-group">
@@ -91,15 +115,17 @@ function Login() {
                   </div>
                   <Form.Control
                     type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    name="password"
+                    placeholder="password"
+                    value={values.password}
+                    onChange={updateField}
                   />
                 </div>
                 <div class="row align-items-center remember">
                   <input type="checkbox" />Remember Me
               </div>
                 <div class="form-group">
-                  <input type="submit" value="Login" class="btn float-right login_btn" disabled={!validateForm()}></input>
+                  <input type="submit" value="Login" class="btn float-right login_btn"></input>
                 </div><br></br><br></br>
                 {values.message && (
               <div className="form-group">
@@ -117,10 +143,11 @@ function Login() {
             </div>
             <div class="card-footer">
               <div class="d-flex justify-content-center links">
-                Don't have an account?<a href="#">Sign Up</a>
+                Don't have an account?
+                <a href="./Signup">click here to signUp</a>
               </div>
               <div class="d-flex justify-content-center">
-                <a href="#">Forgot your password?</a>
+                <a href="./signup">Forgot your password?</a>
               </div>
             </div>
           </div>
